@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TkillaBoom Балы</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    /* Основные стили остаются без изменений */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0f0f1a;
+      color: white;
+      padding: 20px;
+      overflow-x: auto;
+    }
+    h1 {
+      font-size: 24px;
+      color: #39ff14;
+      border: 2px solid #39ff14;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    #search-container {
+      margin-bottom: 15px;
+      position: sticky;
+      left: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      width: 100%;
+      background-color: #1e1e2d;
+      color: white;
+      border: 1px solid #39ff14;
+      border-radius: 6px;
+      font-size: 14px;
+      max-width: 400px;
+    }
+    .info-btn {
+      background-color: #1e1e2d;
+      color: #39ff14;
+      border: 1px solid #39ff14;
+      border-radius: 6px;
+      padding: 8px 15px;
+      cursor: pointer;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+    }
+    .info-btn:hover {
+      background-color: #2a2a3d;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+    }
+    .modal-content {
+      background-color: #1e1e2d;
+      margin: 10% auto;
+      padding: 20px;
+      border: 2px solid #39ff14;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: white;
+    }
+    .info-item {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #2a2a3d;
+    }
+    .info-item:last-child {
+      border-bottom: none;
+    }
+    /* Остальные стили таблицы остаются без изменений */
+    .table-container {
+      overflow-x: auto;
+      margin: 0 auto;
+      max-width: 100%;
+    }
+    table {
+      border-collapse: collapse;
+      background-color: #1e1e2d;
+      border: 1px solid #39ff14;
+      margin: 0 auto;
+      font-size: 12px;
+    }
+    th {
+      border: 1px solid #39ff14;
+      padding: 8px 6px;
+      text-align: center;
+      background-color: #1a1a2e;
+      color: #39ff14;
+      position: sticky;
+      top: 0;
+      white-space: nowrap;
+    }
+    td {
+      border-right: 1px solid #39ff14;
+      padding: 6px 4px;
+      text-align: center;
+      border-bottom: 1px solid #39ff14;
+      white-space: nowrap;
+    }
+    tr:hover {
+      background-color: #2a2a3d;
+    }
+    .medal-icon {
+      height: 25px;
+      vertical-align: middle;
+    }
+    .place-cell {
+      text-align: center;
+      min-width: 40px;
+      position: sticky;
+      left: 0;
+      background-color: #1e1e2d;
+    }
+    .nickname-cell {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      text-align: left;
+      position: sticky;
+      left: 40px;
+      background-color: #1e1e2d;
+      min-width: 120px;
+    }
+    .score-cell {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+      min-width: 60px;
+    }
+    .gear-cell {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      color: #39ff14;
+      min-width: 50px;
+    }
+    .gear-header {
+      font-size: 10px;
+      padding: 8px 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TkillaBoom Балы</h1>
+  
+  <div id="search-container">
+    <input type="text" id="search" placeholder="Поиск по нику...">
+    <button class="info-btn" id="infoBtn">Инфо</button>
+  </div>
+  
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Пояснения по шмоту</h2>
+      <div class="info-item">
+        <strong>А</strong> — Шмот за очки Арены
+      </div>
+      <div class="info-item">
+        <strong>БКД</strong> — Баш КД
+      </div>
+      <div class="info-item">
+        <strong>БХП</strong> — Баш ХП
+      </div>
+      <div class="info-item">
+        <strong>В / П</strong> — Шмот за Империалы Величия
+      </div>
+      <div class="info-item">
+        <strong>СХП</strong> — Сопра ХП
+      </div>
+      <div class="info-item">
+        <strong>Х2ПК</strong> — х2 Перекрафт с весны (Только если Кристал Свирепости)
+      </div>
+      <div class="info-item">
+        <strong>ПК</strong> — Перекрафт Дефолт (Только если Кристал Свирепости)
+      </div>
+    </div>
+  </div>
+  
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th class="place-cell">Место</th>
+          <th class="nickname-cell">Никнейм</th>
+          <th>Балы</th>
+          <th class="gear-header">Уровень</th>
+          <th class="gear-header">Пуха</th>
+          <th class="gear-header">Голова</th>
+          <th class="gear-header">Тело</th>
+          <th class="gear-header">Руки</th>
+          <th class="gear-header">Ноги</th>
+          <th class="gear-header">Пояс</th>
+          <th class="gear-header">Плащ</th>
+          <th class="gear-header">Амулет</th>
+          <th class="gear-header">Браслет(Л)</th>
+          <th class="gear-header">Браслет(П)</th>
+          <th class="gear-header">Кольцо(Л)</th>
+          <th class="gear-header">Кольцо(П)</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQsGmsX5EgD1ATXQOKPJPrpRqVk1Zn9-NOGNTOL5-nMQrKtNRDTT1qM1Us3DDfA0_4Jd5uIDZbfSyEA/pub?gid=0&single=true&output=csv";
+
+    // Модальное окно
+    const modal = document.getElementById("infoModal");
+    const btn = document.getElementById("infoBtn");
+    const span = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    function cleanCell(text) {
+      return text ? text.toString().trim().replace(/^"|"$/g, '') : '';
+    }
+
+    function getMedalImage(place) {
+      if (place >= 1 && place <= 15) {
+        return `<img src="medals/Medal${place}.png" alt="Место ${place}" class="medal-icon">`;
+      }
+      return place;
+    }
+
+    async function fetchData() {
+      try {
+        const response = await fetch(CSV_URL);
+        const data = await response.text();
+        const rows = data.split('\n').filter(row => row.trim() !== '');
+        const tableBody = document.getElementById("table-body");
+        tableBody.innerHTML = "";
+
+        // Пропускаем первые 2 строки
+        for (let i = 2; i < rows.length; i++) {
+          const row = rows[i];
+          const cols = row.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(cleanCell);
+          
+          if (cols.length >= 3) {
+            const place = parseInt(cols[0]);
+            const nickname = cols[1] || "";
+            const score = cols[2] || "";
+            // Экипировка (колонки E, G-R)
+            const level = cols[4] || "0";       // E
+            const puha = cols[6] || "0";       // G
+            const head = cols[7] || "0";       // H
+            const body = cols[8] || "0";       // I
+            const hands = cols[9] || "0";      // J
+            const legs = cols[10] || "0";      // K
+            const belt = cols[11] || "0";      // L
+            const cloak = cols[12] || "0";     // M
+            const amulet = cols[13] || "0";    // N
+            const braceletL = cols[14] || "0"; // O
+            const braceletR = cols[15] || "0"; // P
+            const ringL = cols[16] || "0";     // Q
+            const ringR = cols[17] || "0";     // R
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td class="place-cell">${!isNaN(place) ? getMedalImage(place) : ''}</td>
+              <td class="nickname-cell">${nickname}</td>
+              <td class="score-cell">${score}</td>
+              <td class="gear-cell">${level}</td>
+              <td class="gear-cell">${puha}</td>
+              <td class="gear-cell">${head}</td>
+              <td class="gear-cell">${body}</td>
+              <td class="gear-cell">${hands}</td>
+              <td class="gear-cell">${legs}</td>
+              <td class="gear-cell">${belt}</td>
+              <td class="gear-cell">${cloak}</td>
+              <td class="gear-cell">${amulet}</td>
+              <td class="gear-cell">${braceletL}</td>
+              <td class="gear-cell">${braceletR}</td>
+              <td class="gear-cell">${ringL}</td>
+              <td class="gear-cell">${ringR}</td>
+            `;
+            tableBody.appendChild(tr);
+          }
+        }
+      } catch (err) {
+        console.error("Ошибка загрузки данных:", err);
+      }
+    }
+
+    document.getElementById("search").addEventListener("input", function() {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll("#table-body tr");
+      rows.forEach(row => {
+        const nickname = row.querySelector(".nickname-cell").textContent.toLowerCase();
+        row.style.display = nickname.includes(filter) ? "" : "none";
+      });
+    });
+
+    // Загружаем данные сразу
+    fetchData();
+    // Обновляем каждые 30 секунд
+    setInterval(fetchData, 30000);
+  </script>
+</body>
+</html>
