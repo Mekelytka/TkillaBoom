@@ -6,7 +6,6 @@
   <title>TkillaBoom Балы</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    /* Основные стили остаются без изменений */
     body {
       font-family: Arial, sans-serif;
       background-color: #0f0f1a;
@@ -93,7 +92,6 @@
     .info-item:last-child {
       border-bottom: none;
     }
-    /* Остальные стили таблицы остаются без изменений */
     .table-container {
       overflow-x: auto;
       margin: 0 auto;
@@ -115,6 +113,17 @@
       position: sticky;
       top: 0;
       white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    th:hover {
+      background-color: #2a2a3d;
+    }
+    th.sorted-asc::after {
+      content: " ↑";
+    }
+    th.sorted-desc::after {
+      content: " ↓";
     }
     td {
       border-right: 1px solid #39ff14;
@@ -203,9 +212,9 @@
     <table>
       <thead>
         <tr>
-          <th class="place-cell">Место</th>
-          <th class="nickname-cell">Никнейм</th>
-          <th>Балы</th>
+          <th class="place-cell" data-sort="place">Место</th>
+          <th class="nickname-cell" data-sort="nickname">Никнейм</th>
+          <th data-sort="score">Балы</th>
           <th class="gear-header">Уровень</th>
           <th class="gear-header">Пуха</th>
           <th class="gear-header">Голова</th>
@@ -227,6 +236,8 @@
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQsGmsX5EgD1ATXQOKPJPrpRqVk1Zn9-NOGNTOL5-nMQrKtNRDTT1qM1Us3DDfA0_4Jd5uIDZbfSyEA/pub?gid=0&single=true&output=csv";
+    let playersData = [];
+    let currentSort = { column: 'place', direction: 'asc' };
 
     // Модальное окно
     const modal = document.getElementById("infoModal");
@@ -258,60 +269,124 @@
       return place;
     }
 
+    function sortData() {
+      const { column, direction } = currentSort;
+      
+      playersData.sort((a, b) => {
+        let valueA = a[column];
+        let valueB = b[column];
+        
+        // Для числовых значений
+        if (column === 'place' || column === 'score') {
+          valueA = parseInt(valueA) || 0;
+          valueB = parseInt(valueB) || 0;
+          return direction === 'asc' ? valueA - valueB : valueB - valueA;
+        }
+        
+        // Для строковых значений (никнейм)
+        valueA = valueA?.toString().toLowerCase() || '';
+        valueB = valueB?.toString().toLowerCase() || '';
+        return direction === 'asc' 
+          ? valueA.localeCompare(valueB) 
+          : valueB.localeCompare(valueA);
+      });
+      
+      renderTable();
+    }
+
+    function renderTable() {
+      const tableBody = document.getElementById("table-body");
+      tableBody.innerHTML = "";
+      
+      playersData.forEach(player => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="place-cell">${!isNaN(player.place) ? getMedalImage(player.place) : ''}</td>
+          <td class="nickname-cell">${player.nickname}</td>
+          <td class="score-cell">${player.score}</td>
+          <td class="gear-cell">${player.level}</td>
+          <td class="gear-cell">${player.puha}</td>
+          <td class="gear-cell">${player.head}</td>
+          <td class="gear-cell">${player.body}</td>
+          <td class="gear-cell">${player.hands}</td>
+          <td class="gear-cell">${player.legs}</td>
+          <td class="gear-cell">${player.belt}</td>
+          <td class="gear-cell">${player.cloak}</td>
+          <td class="gear-cell">${player.amulet}</td>
+          <td class="gear-cell">${player.braceletL}</td>
+          <td class="gear-cell">${player.braceletR}</td>
+          <td class="gear-cell">${player.ringL}</td>
+          <td class="gear-cell">${player.ringR}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function setupSorting() {
+      const headers = document.querySelectorAll("th[data-sort]");
+      
+      headers.forEach(header => {
+        header.addEventListener("click", () => {
+          const column = header.getAttribute("data-sort");
+          
+          // Удаляем классы сортировки у всех заголовков
+          headers.forEach(h => {
+            h.classList.remove("sorted-asc", "sorted-desc");
+          });
+          
+          // Если кликнули по той же колонке, меняем направление
+          if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+          } else {
+            // Если кликнули по новой колонке, сортируем по возрастанию
+            currentSort.column = column;
+            currentSort.direction = 'asc';
+          }
+          
+          // Добавляем класс для визуального отображения сортировки
+          header.classList.add(`sorted-${currentSort.direction}`);
+          
+          sortData();
+        });
+      });
+    }
+
     async function fetchData() {
       try {
         const response = await fetch(CSV_URL);
         const data = await response.text();
         const rows = data.split('\n').filter(row => row.trim() !== '');
-        const tableBody = document.getElementById("table-body");
-        tableBody.innerHTML = "";
-
+        
+        playersData = [];
+        
         // Пропускаем первые 2 строки
         for (let i = 2; i < rows.length; i++) {
           const row = rows[i];
           const cols = row.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(cleanCell);
           
           if (cols.length >= 3) {
-            const place = parseInt(cols[0]);
-            const nickname = cols[1] || "";
-            const score = cols[2] || "";
-            // Экипировка (колонки E, G-R)
-            const level = cols[4] || "0";       // E
-            const puha = cols[6] || "0";       // G
-            const head = cols[7] || "0";       // H
-            const body = cols[8] || "0";       // I
-            const hands = cols[9] || "0";      // J
-            const legs = cols[10] || "0";      // K
-            const belt = cols[11] || "0";      // L
-            const cloak = cols[12] || "0";     // M
-            const amulet = cols[13] || "0";    // N
-            const braceletL = cols[14] || "0"; // O
-            const braceletR = cols[15] || "0"; // P
-            const ringL = cols[16] || "0";     // Q
-            const ringR = cols[17] || "0";     // R
-
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td class="place-cell">${!isNaN(place) ? getMedalImage(place) : ''}</td>
-              <td class="nickname-cell">${nickname}</td>
-              <td class="score-cell">${score}</td>
-              <td class="gear-cell">${level}</td>
-              <td class="gear-cell">${puha}</td>
-              <td class="gear-cell">${head}</td>
-              <td class="gear-cell">${body}</td>
-              <td class="gear-cell">${hands}</td>
-              <td class="gear-cell">${legs}</td>
-              <td class="gear-cell">${belt}</td>
-              <td class="gear-cell">${cloak}</td>
-              <td class="gear-cell">${amulet}</td>
-              <td class="gear-cell">${braceletL}</td>
-              <td class="gear-cell">${braceletR}</td>
-              <td class="gear-cell">${ringL}</td>
-              <td class="gear-cell">${ringR}</td>
-            `;
-            tableBody.appendChild(tr);
+            playersData.push({
+              place: parseInt(cols[0]) || 0,
+              nickname: cols[1] || "",
+              score: cols[2] || "0",
+              level: cols[4] || "0",
+              puha: cols[6] || "0",
+              head: cols[7] || "0",
+              body: cols[8] || "0",
+              hands: cols[9] || "0",
+              legs: cols[10] || "0",
+              belt: cols[11] || "0",
+              cloak: cols[12] || "0",
+              amulet: cols[13] || "0",
+              braceletL: cols[14] || "0",
+              braceletR: cols[15] || "0",
+              ringL: cols[16] || "0",
+              ringR: cols[17] || "0"
+            });
           }
         }
+        
+        sortData();
       } catch (err) {
         console.error("Ошибка загрузки данных:", err);
       }
@@ -326,10 +401,11 @@
       });
     });
 
-    // Загружаем данные сразу
+    // Инициализация
     fetchData();
+    setupSorting();
     // Обновляем каждые 30 секунд
     setInterval(fetchData, 30000);
   </script>
 </body>
-</html> 
+</html>
