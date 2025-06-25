@@ -113,8 +113,13 @@
       vertical-align: middle;
     }
       .star-icon {
-      height: 12px;
-      margin-left: 4px;
+  height: 24px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+      .class-icon {
+      height: 24px;
+      margin-right: 6px;
       vertical-align: middle;
     }
   </style>
@@ -185,7 +190,7 @@
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="place-cell">${!isNaN(player.place) ? getMedalImage(player.place) : ''}</td>
-          <td class="nickname-cell">${player.nickname}</td>
+          <td class="nickname-cell"><img src="medals/${player.className}.png" alt="${player.className}" class="class-icon"> ${player.nickname}</td>
           <td class="score-cell">${player.score} <img src="medals/Star.png" alt="*" class="star-icon"></td>
         `;
         tr.style.backgroundImage = `url('medals/row_bg${(index % 2 === 0) ? 2 : 1}.png')`;
@@ -224,7 +229,8 @@
             playersData.push({
               place: parseFloat(cols[0]) || 0,
               nickname: cols[1] || "",
-              score: cols[2] || "0"
+              score: cols[2] || "0",
+              className: cols[3] || ""
             });
           }
         }
