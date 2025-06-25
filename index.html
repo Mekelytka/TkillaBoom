@@ -71,37 +71,39 @@
     }
     table {
       border-collapse: collapse;
-      width: 100%;
-      background-color: #1e1e2d;
-      border: 1px solid #39ff14;
+      background-color: transparent;
+      width: auto;
     }
     th, td {
       border: 1px solid #39ff14;
-      padding: 8px 12px;
+      padding: 4px 8px;
       text-align: center;
-      font-size: 14px;
+      font-size: 12px;
+      white-space: nowrap;
     }
     th {
-      background-color: #1a1a2e;
+      background-color: rgba(26, 26, 46, 0.8);
       color: #39ff14;
       cursor: pointer;
     }
     tr:hover {
-      background-color: #2a2a3d;
+      background-color: rgba(42, 42, 61, 0.5);
     }
     .nickname-cell {
       font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
+      font-size: 11px;
+      background-color: transparent;
     }
     .score-cell {
       font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
+      font-size: 11px;
     }
     .place-cell {
-      min-width: 50px;
+      min-width: 40px;
+      background-color: transparent;
     }
     .medal-icon {
-      height: 25px;
+      height: 24px;
       vertical-align: middle;
     }
   </style>
@@ -231,7 +233,7 @@
 
     fetchData();
     setupSorting();
-    setInterval(fetchData, 30000);
+    setInterval(fetchData, 1000);
   </script>
 </body>
 </html>
