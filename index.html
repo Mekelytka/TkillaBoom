@@ -181,13 +181,14 @@
       const tableBody = document.getElementById("table-body");
       tableBody.innerHTML = "";
 
-      playersData.forEach(player => {
+      playersData.forEach((player, index) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="place-cell">${!isNaN(player.place) ? getMedalImage(player.place) : ''}</td>
           <td class="nickname-cell">${player.nickname}</td>
-          <td class="score-cell">\${player.score} <img src="medals/Star.png" alt="*" class="star-icon"></td>
+          <td class="score-cell">${player.score} <img src="medals/Star.png" alt="*" class="star-icon"></td>
         `;
+        tr.style.backgroundImage = `url('medals/row_bg${(index % 2 === 0) ? 2 : 1}.png')`;
         tableBody.appendChild(tr);
       });
     }
