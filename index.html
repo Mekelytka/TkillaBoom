@@ -107,6 +107,11 @@
       height: 24px;
       vertical-align: middle;
     }
+      .star-icon {
+      height: 12px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
@@ -176,7 +181,7 @@
         tr.innerHTML = `
           <td class="place-cell">${!isNaN(player.place) ? getMedalImage(player.place) : ''}</td>
           <td class="nickname-cell">${player.nickname}</td>
-          <td class="score-cell">${player.score}</td>
+          <td class="score-cell">\${player.score} <img src="medals/Star.png" alt="*" class="star-icon"></td>
         `;
         tableBody.appendChild(tr);
       });
