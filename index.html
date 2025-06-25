@@ -10,12 +10,15 @@
       font-family: Arial, sans-serif;
       color: white;
       padding: 20px;
-      overflow-x: auto;
+      margin: 0;
       background-image: url('medals/Background1.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
       background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     body::before {
       content: "";
@@ -35,15 +38,12 @@
     }
     #search-container {
       margin-bottom: 15px;
-      position: sticky;
-      left: 20px;
       display: flex;
       justify-content: center;
       gap: 10px;
     }
     input[type="text"] {
       padding: 8px;
-      width: 100%;
       background-color: #1e1e2d;
       color: white;
       border: 1px solid #39ff14;
@@ -63,6 +63,46 @@
     }
     .info-btn:hover {
       background-color: #2a2a3d;
+    }
+    .table-container {
+      overflow-x: auto;
+      width: 100%;
+      max-width: 1000px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background-color: #1e1e2d;
+      border: 1px solid #39ff14;
+    }
+    th, td {
+      border: 1px solid #39ff14;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background-color: #1a1a2e;
+      color: #39ff14;
+      cursor: pointer;
+    }
+    tr:hover {
+      background-color: #2a2a3d;
+    }
+    .nickname-cell {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+    }
+    .score-cell {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+    }
+    .place-cell {
+      min-width: 50px;
+    }
+    .medal-icon {
+      height: 25px;
+      vertical-align: middle;
     }
   </style>
 </head>
@@ -110,15 +150,15 @@
         let valueB = b[column];
 
         if (column === 'place' || column === 'score') {
-          valueA = parseInt(valueA) || 0;
-          valueB = parseInt(valueB) || 0;
+          valueA = parseFloat(valueA) || 0;
+          valueB = parseFloat(valueB) || 0;
           return direction === 'asc' ? valueA - valueB : valueB - valueA;
         }
 
         valueA = valueA?.toString().toLowerCase() || '';
         valueB = valueB?.toString().toLowerCase() || '';
-        return direction === 'asc' 
-          ? valueA.localeCompare(valueB) 
+        return direction === 'asc'
+          ? valueA.localeCompare(valueB)
           : valueB.localeCompare(valueA);
       });
       renderTable();
@@ -168,7 +208,7 @@
           const cols = row.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(cleanCell);
           if (cols.length >= 3) {
             playersData.push({
-              place: parseInt(cols[0]) || 0,
+              place: parseFloat(cols[0]) || 0,
               nickname: cols[1] || "",
               score: cols[2] || "0"
             });
