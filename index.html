@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <link rel="icon" type="image/png" href="medals/favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TkillaBoom Балы</title>
@@ -137,6 +138,7 @@
       <thead>
         <tr>
           <th class="place-cell" data-sort="place">Место</th>
+          <th data-sort="class">Класс</th>
           <th class="nickname-cell" data-sort="nickname">Ник</th>
           <th data-sort="score">Баллы</th>
         </tr>
@@ -190,7 +192,8 @@
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="place-cell">${!isNaN(player.place) ? getMedalImage(player.place) : ''}</td>
-          <td class="nickname-cell"><img src="medals/${player.className}.png" alt="${player.className}" class="class-icon"> ${player.nickname}</td>
+          <td><img src="medals/${player.className}.png" alt="${player.className}" class="class-icon"></td>
+          <td class="nickname-cell">${player.nickname}</td>
           <td class="score-cell">${player.score} <img src="medals/Star.png" alt="*" class="star-icon"></td>
         `;
         tr.style.backgroundImage = `url('medals/row_bg${(index % 2 === 0) ? 2 : 1}.png')`;
